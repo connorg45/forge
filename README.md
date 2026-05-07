@@ -1,6 +1,6 @@
 # Forge
 
-Forge is a self-hostable distributed job queue and cron scheduler for teams that want durable Postgres-backed jobs, simple operations, and a live React control plane without taking on a broker fleet. On an Apple M4 with 16 GB RAM, Forge enqueued **3,369.80 jobs/sec across 2 workers with p99 enqueue latency of 25.24 ms**, and the chaos run completed **10,000/10,000 jobs with zero dead-letter rows** while SIGKILLing workers every 5 seconds for 60 seconds.
+Forge is a self-hostable distributed job queue and cron scheduler for teams that want durable Postgres-backed jobs, simple operations, and a live React control plane without taking on a broker fleet. On an Apple M4 with 16 GB RAM, Forge enqueued **2,091.20 jobs/sec across 2 workers with p99 enqueue latency of 45.34 ms**, and the chaos run completed **10,000/10,000 jobs with zero dead-letter rows** while SIGKILLing workers every 5 seconds for 60 seconds.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ Dashboard: http://localhost:5173. API health: http://localhost:8080/healthz. Gra
 
 | workers | throughput (jobs/sec) | p50 | p95 | p99 | hardware |
 |---:|---:|---:|---:|---:|---|
-| 2 | 3,369.80 | 8.41 ms | 18.28 ms | 25.24 ms | Apple M4, 16 GB RAM, Docker Desktop |
+| 2 | 2,091.20 | 13.49 ms | 29.02 ms | 45.34 ms | Apple M4, 16 GB RAM, Docker Desktop |
 
 ## Failure Modes
 
