@@ -6,7 +6,10 @@ API_URL="${API_URL:-http://localhost:8080}"
 TOTAL="${TOTAL:-10000}"
 KILL_SECONDS="${KILL_SECONDS:-60}"
 
-$COMPOSE up -d --build --scale worker=4 postgres redis api worker
+trap '$COMPOSE up -d --scale worker=2 worker >/dev/null 2>&1 || true' EXIT
+
+$COMPOSE up -d --build postgres redis api
+$COMPOSE stop worker >/dev/null 2>&1 || true
 
 until curl -fsS "$API_URL/healthz" >/dev/null; do
   sleep 1
@@ -17,16 +20,21 @@ CREATE TABLE IF NOT EXISTS chaos_results (
   job_id uuid PRIMARY KEY,
   created_at timestamptz DEFAULT now()
 );
-TRUNCATE dead_letter, job_runs, jobs, chaos_results;
+TRUNCATE dead_letter, job_runs, jobs, chaos_results RESTART IDENTITY;
 SQL
+
+$COMPOSE up -d --scale worker=4 worker
 
 kill_loop() {
   local end=$((SECONDS + KILL_SECONDS))
   while [ "$SECONDS" -lt "$end" ]; do
-    mapfile -t workers < <($COMPOSE ps -q worker | sed '/^$/d')
-    if [ "${#workers[@]}" -gt 0 ]; then
-      victim="${workers[$((RANDOM % ${#workers[@]}))]}"
+    workers="$($COMPOSE ps -q worker | sed '/^$/d')"
+    count="$(printf '%s\n' "$workers" | sed '/^$/d' | wc -l | tr -d ' ')"
+    if [ "${count:-0}" -gt 0 ]; then
+      index=$((RANDOM % count + 1))
+      victim="$(printf '%s\n' "$workers" | sed -n "${index}p")"
       docker kill --signal=KILL "$victim" >/dev/null 2>&1 || true
+      $COMPOSE up -d --scale worker=4 worker >/dev/null 2>&1 || true
     fi
     sleep 5
   done

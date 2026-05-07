@@ -8,6 +8,7 @@ const duration = __ENV.DURATION || '20s';
 export const options = {
   vus,
   duration,
+  summaryTrendStats: ['avg', 'min', 'med', 'p(50)', 'p(95)', 'p(99)', 'max'],
   thresholds: {
     http_req_failed: ['rate<0.01']
   }
@@ -33,7 +34,7 @@ export default function () {
 export function handleSummary(data) {
   const reqs = data.metrics.http_reqs?.values?.rate ?? 0;
   const latency = data.metrics.http_req_duration?.values ?? {};
-  const p50 = latency['p(50)'] ?? 0;
+  const p50 = latency['p(50)'] ?? latency.med ?? 0;
   const p95 = latency['p(95)'] ?? 0;
   const p99 = latency['p(99)'] ?? 0;
   return {
