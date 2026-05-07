@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		logger.Warn("tracing disabled", "error", err)
 	} else {
-		defer shutdownTracing(context.Background())
+		defer func() { _ = shutdownTracing(context.Background()) }()
 	}
 	if err := store.Migrate(cfg.DatabaseURL); err != nil {
 		logger.Error("migration failed", "error", err)
@@ -49,7 +49,7 @@ func main() {
 	}
 	defer db.Close()
 	redisClient := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 	q := queue.New(db)
 	stats := metrics.NewRecorder(redisClient)
 	hub := api.NewHub()

@@ -23,7 +23,7 @@ func main() {
 	defer stop()
 	shutdownTracing, err := tracing.Init(ctx, "forge-scheduler", cfg.OTLPEndpoint)
 	if err == nil {
-		defer shutdownTracing(context.Background())
+		defer func() { _ = shutdownTracing(context.Background()) }()
 	}
 	if err := store.Migrate(cfg.DatabaseURL); err != nil {
 		logger.Error("migration failed", "error", err)

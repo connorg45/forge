@@ -45,7 +45,7 @@ func Migrate(databaseURL string) error {
 		return err
 	}
 	db := stdlib.OpenDB(*cfg.ConnConfig)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {

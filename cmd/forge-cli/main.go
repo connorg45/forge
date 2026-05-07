@@ -73,7 +73,7 @@ func do(method, url string, body any) {
 	if err != nil {
 		panic(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	out, _ := io.ReadAll(resp.Body)
 	fmt.Println(string(out))
 	if resp.StatusCode >= 300 {

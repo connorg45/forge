@@ -27,7 +27,7 @@ func main() {
 	defer stop()
 	shutdownTracing, err := tracing.Init(ctx, "forge-worker", cfg.OTLPEndpoint)
 	if err == nil {
-		defer shutdownTracing(context.Background())
+		defer func() { _ = shutdownTracing(context.Background()) }()
 	}
 	if err := store.Migrate(cfg.DatabaseURL); err != nil {
 		logger.Error("migration failed", "error", err)
@@ -40,7 +40,7 @@ func main() {
 	}
 	defer db.Close()
 	redisClient := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 	q := queue.New(db)
 	pool := &worker.Pool{
 		Queue:         q,

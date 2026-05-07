@@ -82,7 +82,7 @@ func (r *RedisEvents) Run(ctx context.Context) {
 		return
 	}
 	sub := r.redis.Subscribe(ctx, redisEventChannel)
-	defer sub.Close()
+	defer func() { _ = sub.Close() }()
 	ch := sub.Channel()
 	for {
 		select {
