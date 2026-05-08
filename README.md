@@ -21,7 +21,7 @@ flowchart LR
 ## Quickstart
 
 ```bash
-git clone https://github.com/your-org/forge.git
+git clone https://github.com/connorg45/forge.git
 cd forge
 docker compose -f deploy/docker-compose.yml up --build
 ```
